@@ -22,8 +22,8 @@ export async function signupService(name: string, email: string, password: strin
       data: { user: createdUser }
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("SignupUserService error", error);
-    return { code: 500, status: "error", message: "Unable to create account" };
+    return { code: 500, status: "error", message: error?.message || "Unable to create account" };
   }
-}
+}
