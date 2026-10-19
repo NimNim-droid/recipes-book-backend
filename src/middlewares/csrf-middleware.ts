@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import type { AuthenticatedRequest } from "@/middlewares/auth-middleware";
 import { verifyRefreshToken } from "@/lib/jwt";
 import { validateRequest, csrfSessionCookieName, csrfTokenCookieName } from "@/lib/csrf";
+import { ENV } from "@/config/env";
 
 export class CsrfMiddleware {
   // Run after AuthMiddleware: only successfully verified Bearer authentication can skip CSRF.
@@ -29,6 +30,7 @@ export class CsrfMiddleware {
 
   private validate(req: Request, res: Response, next: NextFunction) {
     if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+    if (process.env.ENABLE_CSRF !== "true" || ENV.NODE_ENV === "development") return next();
     if (validateRequest(req)) return next();
     return res.status(403).json({ code: 403, status: "error", message: "Invalid or missing CSRF token" });
   }
